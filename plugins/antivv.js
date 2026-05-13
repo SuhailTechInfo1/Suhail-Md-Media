@@ -91,7 +91,8 @@ smd({
     }
     
     if (bgmm && bgmm.antiviewonce && bgmm.antiviewonce === "true") {
-      let viewOnceMessage = msg.quoted && msg.quoted.msg && msg.quoted.msg.viewOnce ? msg.quoted : false;
+      // Same detection as vv command
+      var viewOnceMessage = msg.quoted && msg.quoted.msg && msg.quoted.msg.viewOnce ? msg.quoted : false;
       
       if (!viewOnceMessage) return;
       
