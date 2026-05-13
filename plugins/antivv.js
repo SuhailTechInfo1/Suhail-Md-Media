@@ -91,19 +91,20 @@ smd({
     }
     
     if (bgmm && bgmm.antiviewonce && bgmm.antiviewonce === "true") {
-      // Check if msg has viewOnce
-      if (!msg.msg || !msg.msg.viewOnce) return;
+      let viewOnceMessage = msg.quoted && msg.quoted.msg && msg.quoted.msg.viewOnce ? msg.quoted : false;
+      
+      if (!viewOnceMessage) return;
       
       let fakeMessage = {
-        'key': msg.key,
+        'key': viewOnceMessage.key,
         'message': { 'conversation': "```[VIEWONCE DETECTED] downloading!```" }
       };
       
-      let mediaUrl = await msg.bot.downloadAndSaveMediaMessage(msg.msg);
+      let mediaUrl = await msg.bot.downloadAndSaveMediaMessage(viewOnceMessage.msg);
       
       await msg.bot.sendMessage(msg.sender, {
-        [msg.mtype2.split('Mes')[0]]: { 'url': mediaUrl },
-        'caption': msg.body
+        [viewOnceMessage.mtype2.split('Mes')[0]]: { 'url': mediaUrl },
+        'caption': viewOnceMessage.body
       }, { 'quoted': fakeMessage });
     }
   } catch (error) {
