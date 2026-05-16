@@ -55,29 +55,85 @@ const {
     getBuffer, 
     smdJson,
     smdBuffer
-     } = require('../lib')
+} = require('../lib')
 
-     smd({
-        cmdname: "fakereply",
-        alias :['freply'],
-        desc: "Create fake Reply by given texts!",
-        type: "general",
-        use:" msg| reply_text | number ",
-        usage:"generates fake messages of given text and number!",
-        filename: __filename,
-        public : true,
-      },
-      async (m,text) => {
+smd({
+    pattern: "fakereply",
+    alias: ['freply'],
+    desc: "Create fake Reply by given texts or replied media!",
+    type: "general",
+    use: "msg|reply_text|number|type",
+    usage: "generates fake messages of given text and number!",
+    filename: __filename,
+    public: true,
+}, async (message, args) => {
+    try {
+        let types = ["text", "order", "contact", "image", "video"];
+        let reply, msg, num, type, mediaBuffer;
+        
+        // If replying to a message
+        if (message.quoted) {
+            let quoted = message.quoted;
+            let textArgs = args ? args.split("|") : [];
+            
+            reply = textArgs[0] || " ";
+            msg = textArgs[1] || "";
+            num = textArgs[2] ? `${textArgs[2].replace(/[^0-9]/g, '')}@s.whatsapp.net` : message.sender;
+            type = textArgs[3] && types.includes(textArgs[3]) ? textArgs[3] : 
+                   quoted.mtype == "imageMessage" ? "image" : 
+                   quoted.mtype == "videoMessage" ? "video" : 
+                   quoted.mtype == "audioMessage" ? "audio" : "text";
+            
+            // If replied to media, use that media
+            if (quoted.mtype == "imageMessage" || quoted.mtype == "videoMessage") {
+                mediaBuffer = await message.bot.downloadMediaMessage(quoted);
+            }
+        } else {
+            // Text-based fake reply
+            let textArgs = args.split("|");
+            if (!args || textArgs.length < 3) {
+                return await message.reply(`*Use ${prefix}fakereply text|Reply_text|923184474176|type(text,order,contact,image,video)*\n\n*Or reply to an image/video/audio with:*\n${prefix}fakereply myMessage|theirReply|number`);
+            }
+            reply = textArgs[0];
+            msg = textArgs[1];
+            num = `${textArgs[2].replace(/[^0-9]/g, '')}@s.whatsapp.net`;
+            type = textArgs[3] && types.includes(textArgs[3]) ? textArgs[3] : "text";
+        }
+        
+        let charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        let smds = 'SMD';
+        for (let i = 0; i < 13; i++) {
+            smds += charset[Math.floor(Math.random() * charset.length)];
+        }
+        
+        let fak;
+        
+        if (mediaBuffer && type === "image") {
+            fak = {
+                key: { id: smds, remoteJid: message.isGroup ? message.chat : num, participant: num, fromMe: false },
+                message: { imageMessage: { jpegThumbnail: mediaBuffer.slice(0, 100), caption: msg || "" } }
+            };
+        } else if (mediaBuffer && type === "video") {
+            fak = {
+                key: { id: smds, remoteJid: message.isGroup ? message.chat : num, participant: num, fromMe: false },
+                message: { videoMessage: { url: mediaBuffer, caption: msg || "", mimetype: "video/mp4" } }
+            };
+        } else {
+            fak = await message.bot.fakeMessage(type, { id: smds, remoteJid: message.isGroup ? message.chat : num, participant: num }, msg);
+        }
+        
         try {
-      let types = ["text","order","contact","image" , "video"]
-          let args = text.split("|")
-          if(!text || args.length < 3) return await m.reply(`*Use ${prefix}fakereply text |Reply_text|923184474176|type(text,order,contact,image,video)*`)
-          let reply = args[0],msg = args[1],num = `${args[2].replace(/[^0-9]/g, '')}@s.whatsapp.net` , type = args[3] && types.includes(args[3])? args[3] :"text", charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',smds = 'SMD';    
-          for (let i = 0; i < 13; i++) { smds += charset[Math.floor(Math.random() * charset.length)];  }
-          let  fak =await m.bot.fakeMessage(type,{id: smds,remoteJid:m.isGroup? m.chat : num,participant:num},msg) 
-          try{ if(type === "contact") {fak.message.contactMessage.jpegThumbnail =  await m.getpp(num)  }}catch(e){console.log(e)}
-          await m.bot.sendMessage(m.chat,{text : reply}, { quoted : fak})
-      } catch (e) {
-        m.error(`${e}\n\nCommand: fakereply`, e, false);
-      }
+            if (type === "contact") {
+                fak.message.contactMessage.jpegThumbnail = await message.getpp(num);
+            }
+        } catch (e) {
+            console.log(e);
+        }
+        
+        await message.bot.sendMessage(message.chat, { text: reply }, { quoted: fak });
+        
+    } catch (e) {
+        message.error(`${e}\n\nCommand: fakereply`, e, false);
+    }
+});
       });
