@@ -55,7 +55,7 @@ const {
     getBuffer, 
     smdJson,
     smdBuffer
-} = require('../lib')
+} = require('../lib');
 
 smd({
     pattern: "fakereply",
@@ -79,14 +79,18 @@ smd({
             reply = textArgs[0] || " ";
             msg = textArgs[1] || "";
             num = textArgs[2] ? `${textArgs[2].replace(/[^0-9]/g, '')}@s.whatsapp.net` : message.sender;
-            type = textArgs[3] && types.includes(textArgs[3]) ? textArgs[3] : 
-                   quoted.mtype == "imageMessage" ? "image" : 
-                   quoted.mtype == "videoMessage" ? "video" : 
-                   quoted.mtype == "audioMessage" ? "audio" : "text";
             
-            // If replied to media, use that media
-            if (quoted.mtype == "imageMessage" || quoted.mtype == "videoMessage") {
+            if (quoted.mtype === "imageMessage") {
+                type = "image";
                 mediaBuffer = await message.bot.downloadMediaMessage(quoted);
+            } else if (quoted.mtype === "videoMessage") {
+                type = "video";
+                mediaBuffer = await message.bot.downloadMediaMessage(quoted);
+            } else if (quoted.mtype === "audioMessage") {
+                type = "audio";
+                mediaBuffer = await message.bot.downloadMediaMessage(quoted);
+            } else {
+                type = textArgs[3] && types.includes(textArgs[3]) ? textArgs[3] : "text";
             }
         } else {
             // Text-based fake reply
@@ -136,4 +140,3 @@ smd({
         message.error(`${e}\n\nCommand: fakereply`, e, false);
     }
 });
-      });
