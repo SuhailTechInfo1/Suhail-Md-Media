@@ -1,56 +1,20 @@
 /**
-
-//══════════════════════════════════════════════════════════════════════════════════════════════════════//
-//                                                                                                      //
-//                                ＷＨＡＴＳＡＰＰ ＢＯＴ－ＭＤ ＢＥＴＡ                                   //
-//                                                                                                      // 
-//                                         Ｖ：1．2．2                                                   // 
-//                                                                                                      // 
-//            ███████╗██╗   ██╗██╗  ██╗ █████╗ ██╗██╗         ███╗   ███╗██████╗                        //
-//            ██╔════╝██║   ██║██║  ██║██╔══██╗██║██║         ████╗ ████║██╔══██╗                       //
-//            ███████╗██║   ██║███████║███████║██║██║         ██╔████╔██║██║  ██║                       //
-//            ╚════██║██║   ██║██╔══██║██╔══██║██║██║         ██║╚██╔╝██║██║  ██║                       //
-//            ███████║╚██████╔╝██║  ██║██║  ██║██║███████╗    ██║ ╚═╝ ██║██████╔╝                       //
-//            ╚══════╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝╚══════╝    ╚═╝     ╚═╝╚═════╝                        //
-//                                                                                                      //
-//                                                                                                      //
-//                                                                                                      //
-//══════════════════════════════════════════════════════════════════════════════════════════════════════//
-
-CURRENTLY RUNNING ON BETA VERSION!!
-*
-   * @project_name : Suhail-Md
-   * @author : Suhail <https://github.com/SuhailTechInfo>
-   * @youtube : https://www.youtube.com/c/@SuhailTechInfo
-   * @infoription : Suhail-Md ,A Multi-functional whatsapp user bot.
-   * @version 1.2.5 
-*
-   * Licensed under the  GPL-3.0 License;
-* 
-   * ┌┤Created By Suhail Tech Info.
-   * © 2023 Suhail-Md ✭ ⛥.
-   * plugin date : 11/12/2023
-* 
-   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-   * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-   * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-   * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-   * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-   * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-   * SOFTWARE.
-**/
-
-
-
-
-
-
+ * @project_name : Suhail-Md
+ * @author : Suhail <https://github.com/SuhailTechInfo>
+ * @youtube : https://www.youtube.com/c/@SuhailTechInfo
+ * @description : Suhail-Md ,A Multi-functional whatsapp user bot.
+ * @version 1.2.5 
+ *
+ * Licensed under the  GPL-3.0 License;
+ * Created By Suhail Tech Info.
+ * © 2023 Suhail-Md ✭ ⛥.
+ */
 
 const {
     smd,
     tlang,
     prefix, 
-    Config ,
+    Config,
     sleep,
     getBuffer, 
     smdJson,
@@ -94,10 +58,11 @@ smd({
             }
         } else {
             // Text-based fake reply
-            let textArgs = args.split("|");
-            if (!args || textArgs.length < 3) {
+            if (!args || args.split("|").length < 3) {
                 return await message.reply(`*Use ${prefix}fakereply text|Reply_text|923184474176|type(text,order,contact,image,video)*\n\n*Or reply to an image/video/audio with:*\n${prefix}fakereply myMessage|theirReply|number`);
             }
+            
+            let textArgs = args.split("|");
             reply = textArgs[0];
             msg = textArgs[1];
             num = `${textArgs[2].replace(/[^0-9]/g, '')}@s.whatsapp.net`;
